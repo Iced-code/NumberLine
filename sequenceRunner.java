@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.Timer;
+
 
 // MAIN PROGRAM EXECUTER
 public class sequenceRunner extends numberSequence {
@@ -39,14 +41,13 @@ public class sequenceRunner extends numberSequence {
 
         frame.addKeyListener(sequence);
 
-        while(true){
+        while(sequence.run() > 0){
             sequence.run();
         }
 
         
-        /* ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        Runnable task = () -> mytTerminal.repaint();
-        // Schedule the task to run every 2 seconds with no initial delay
-        executor.scheduleAtFixedRate(task, 0, 500, TimeUnit.MILLISECONDS); */
+        // ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        // Runnable task = () -> mytTerminal.repaint();
+        // executor.scheduleAtFixedRate(task, 0, 500, TimeUnit.MILLISECONDS);
     }
 }

@@ -62,7 +62,7 @@ public class numberSequence extends JPanel implements KeyListener {
         this.targetNum = newTarget();
         this.score = 0;
         
-        this.numberPool = (ArrayList<Integer>) generatedNumbers.clone();
+        this.numberPool = new ArrayList<>(generatedNumbers);
         this.numbersInput = new ArrayList<Integer>();
         this.operations = new ArrayList<Character>();
 
@@ -94,7 +94,7 @@ public class numberSequence extends JPanel implements KeyListener {
 
     private void reset(){
         generatedNumbers = generateNumberList();
-        numberPool = (ArrayList<Integer>) generatedNumbers.clone();
+        numberPool = new ArrayList<>(generatedNumbers);
         numbersInput.clear();
         operations.clear();
         input = "";
@@ -165,7 +165,9 @@ public class numberSequence extends JPanel implements KeyListener {
     }
 
     // VOID FUNCTION THAT KEEPS PROGRAMMING INFINITELY RUNNING
-    public void run(){}
+    public int run(){
+        return lives;
+    }
 
     // KEY TYPED
     @Override
@@ -228,7 +230,8 @@ public class numberSequence extends JPanel implements KeyListener {
             else if(numbersInput.size() == 2){
                 generatedNumbers.removeAll(numbersInput);
                 generatedNumbers.add(total);
-                numberPool = (ArrayList<Integer>) generatedNumbers.clone();
+                numberPool = new ArrayList<>(generatedNumbers);
+
                 numbersInput.clear();
                 operations.clear();
                 input = "";
@@ -244,7 +247,8 @@ public class numberSequence extends JPanel implements KeyListener {
         }
         else if(e.getKeyCode() == KeyEvent.VK_ESCAPE){  // CLEAR INPUT FIELD
             input = "";
-            numberPool = (ArrayList<Integer>) generatedNumbers.clone();
+            numberPool = new ArrayList<>(generatedNumbers);
+
             numbersInput.clear();
             operations.clear();
             total = 0;
