@@ -40,11 +40,6 @@ public class multipliersPool {
         multipliers.add(new multiplier_multiplicationPlus());
         multipliers.add(new multiplier_divisionPlus());
         multipliers.add(new multiplier_fourAndBelow());
-
-        /* multipliers.add(new multiplier("Addition+", 10, '+'));
-        multipliers.add(new multiplier("Subtraction+", 20, '+'));
-        multipliers.add(new multiplier("Multiplication+", 15, '*'));
-        multipliers.add(new multiplier("Division+", 25, '/')); */
     }
 
     public multiplier getRandomMultiplier(){

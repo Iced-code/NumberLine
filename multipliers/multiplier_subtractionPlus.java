@@ -1,6 +1,7 @@
 package multipliers;
 
 import java.util.*;
+import rules.*;
 
 
 public class multiplier_subtractionPlus extends multiplier{
@@ -9,7 +10,7 @@ public class multiplier_subtractionPlus extends multiplier{
         super("subtraction+", 20, '+');
     }
 
-    public int calculateBonus(int score, ArrayList<Integer> numbers, ArrayList<Character> operators) {
+    public int calculateBonus(int score, ArrayList<Integer> numbers, ArrayList<Character> operators, rule activeRule) {
         return (getNumberBonus() * getCharCount(operators, '-'));
     }
 }

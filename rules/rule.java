@@ -1,4 +1,4 @@
-package multipliers;
+package rules;
 import java.awt.*;
 import java.io.*;
 import javax.imageio.ImageIO;
@@ -23,38 +23,39 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import rules.*;
 
-
-public abstract class multiplier {
+public class rule {
     private String name;
-    private int numberBonus;
-    private char multiplierType;
+    private String description;
+    private boolean isActive;
 
-    public multiplier(String name, int numberBonus, char type){
+    public rule(String name, String desc){
         this.name = name;
-        this.numberBonus = numberBonus;
-        this.multiplierType = type;
+        this.description = desc;
+        this.isActive = false;
     }
 
     public String getName(){
         return name;
     }
-    public int getNumberBonus(){
-        return numberBonus;
+    public String getDescription(){
+        return description;
     }
-    public char getMultiplierType(){
-        return multiplierType;
+    public boolean getActiveStatus(){
+        return isActive;
     }
 
     public void setName(String aName){
         name = aName;
     }
-    public void setNumberBonus(int newBonus){
-        numberBonus = newBonus;
+    public void setDescription(String aDesc){
+        description = aDesc;
     }
-    public void setMultiplierType(char newType){
-        multiplierType = newType;
+    public void setActiveStatus(boolean newStatus){
+        isActive = newStatus;
+    }
+    public void setActiveStatus(){
+        isActive = !isActive;
     }
 
     public int getNumCount(ArrayList<Integer> list, Integer i){
@@ -82,14 +83,19 @@ public abstract class multiplier {
     }
 
     public String flavorText() {
-        return getName() + " (" + getMultiplierType() + getNumberBonus() + ")";
+        return getName() + "\n" + getDescription();
     }
 
-    public abstract int calculateBonus(int score, ArrayList<Integer> numbers, ArrayList<Character> operators, rule activeRule);
+    public int applyRule(int score, ArrayList<Integer> numbers, ArrayList<Character> operators){
+        return -1;
+    }
 
     public void paint(Graphics2D g, int x, int y){
-        g.setColor(Color.ORANGE);
+        g.setColor(Color.RED);
+        g.setFont(new Font("Verdana", Font.BOLD, 30));
+        g.drawString(getName(), x, y);
+
         g.setFont(new Font("Verdana", Font.PLAIN, 22));
-        g.drawString(flavorText(), x, y);
+        g.drawString(getDescription(), x, y+40);
     }
 }

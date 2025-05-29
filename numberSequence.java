@@ -16,6 +16,8 @@ import javax.swing.*;
 import javax.swing.text.PlainDocument;
 
 import multipliers.*;
+import rules.rule;
+import rules.rulePool;
 
 import java.util.*;
 import java.util.Timer;
@@ -34,6 +36,8 @@ public class numberSequence extends JPanel implements KeyListener {
     private ArrayList<Integer> numbersInput;
     private ArrayList<Integer> numberPool;
     private ArrayList<Character> operations;
+
+    private ArrayList<Integer> indexes;
     
     private int total;
     private int targetNum;
@@ -45,6 +49,9 @@ public class numberSequence extends JPanel implements KeyListener {
 
     private ArrayList<multiplier> activeMultipliers;
     private multipliersPool mPool;
+
+    private rule currentRule;
+    private rulePool rPool;
 
     private Image instructions;
     
@@ -66,8 +73,13 @@ public class numberSequence extends JPanel implements KeyListener {
         this.numbersInput = new ArrayList<Integer>();
         this.operations = new ArrayList<Character>();
 
+        this.indexes = new ArrayList<>();
+
         this.activeMultipliers = new ArrayList<multiplier>();
         this.mPool = new multipliersPool();
+
+        this.currentRule = new rule("", "");
+        this.rPool = new rulePool();
     }
 
     private ArrayList<Integer> generateNumberList(){
@@ -96,6 +108,7 @@ public class numberSequence extends JPanel implements KeyListener {
         generatedNumbers = generateNumberList();
         numberPool = new ArrayList<>(generatedNumbers);
         numbersInput.clear();
+        indexes.clear();
         operations.clear();
         input = "";
         total = 0;
@@ -134,34 +147,52 @@ public class numberSequence extends JPanel implements KeyListener {
             }
             else if(ops.get(i) == '/'){
                 try {
-                    total /= numbers.get(i+1);
-                } catch(ArithmeticException e) {
-
-                }
+                    if(total % numbers.get(i+1) == 0){
+                        total /= numbers.get(i+1);
+                    }
+                } catch(ArithmeticException e) {}
             }
         }
 
         return total;
     }
 
+    public void newMultiplier(){
+        multiplier x;
+        
+        do{
+            x = mPool.getRandomMultiplier();
+        }
+        while(activeMultipliers.contains(x));
+
+        activeMultipliers.add(x);
+    }
+
+    public void newRule(){
+        rule x = rPool.getRandomRule();
+        if(!currentRule.equals(x) && !currentRule.getActiveStatus()) {
+            currentRule = x;
+        }
+    }
+
     public int increaseScore(ArrayList<Integer> numbersInputted, int bonus){
-        int sum = 25 * (numbersInputted.size() + bonus);
+        int sum = 25 * (numbersInputted.size() + bonus);    // raw score (25pts/number)
+        int rulePenalty = 0;
+        int multipliersBonus = 0;
+
+        if(currentRule.getActiveStatus()){
+            rulePenalty = currentRule.applyRule(sum, numbersInputted, operations);
+        }
 
         if(activeMultipliers.size() > 0){
             for(multiplier x : activeMultipliers){
-                //System.out.println(x.calculateBonus(sum, numbersInputted, operations));
-                sum = sum + x.calculateBonus(sum, numbersInputted, operations);
+                multipliersBonus = multipliersBonus + x.calculateBonus(sum, numbersInputted, operations, currentRule);
             }
         }
 
-        return sum;
-    }
+        sum = sum + rulePenalty + multipliersBonus;
 
-    public void newMultiplier(){
-        multiplier x = mPool.getRandomMultiplier();
-        if(!activeMultipliers.contains(x)) {
-            activeMultipliers.add(x);
-        }
+        return sum;
     }
 
     // VOID FUNCTION THAT KEEPS PROGRAMMING INFINITELY RUNNING
@@ -174,11 +205,20 @@ public class numberSequence extends JPanel implements KeyListener {
     public void keyTyped(KeyEvent e) {
         char c = e.getKeyChar();
 
-        // TAKES CHARACTER TYPED & ADDS TO INPUT. IF TYPED A NUMBER -> ADDED TO NUMBER POOL, ELSE IF AN OPERATOR -> ADDED TO OPERATOR PPOL.
+        // TAKES CHARACTER TYPED & ADDS TO INPUT. IF TYPED A NUMBER -> ADDED TO NUMBER POOL, ELSE IF AN OPERATOR -> ADDED TO OPERATOR POOL.
         if(generatedNumbers.contains(Character.getNumericValue(c)) && numberPool.contains(Character.getNumericValue(c)) && (input.length() == 0 || isOperation(input.charAt(input.length() - 1)))){
             input += c;
+
+            if(numbersInput.contains(Character.getNumericValue(c))){
+                indexes.add(generatedNumbers.lastIndexOf(Character.getNumericValue(c)));
+            }
+            else {
+                indexes.add(generatedNumbers.indexOf(Character.getNumericValue(c)));
+            }
+
             numberPool.remove((Object)Character.getNumericValue(c));
             numbersInput.add(Character.getNumericValue(c));
+
         }
         else if(isOperation(c) && input.length() >= 1){
             if(!isOperation(input.charAt(input.length() - 1))){
@@ -207,6 +247,7 @@ public class numberSequence extends JPanel implements KeyListener {
             if (input.length() > 0) {
                 if(!isOperation(input.charAt(input.length() - 1))){
                     numberPool.add(numbersInput.remove(numbersInput.size()-1));
+                    indexes.remove(indexes.size()-1);
                 }
                 else {
                     operations.remove(operations.size()-1);
@@ -219,16 +260,25 @@ public class numberSequence extends JPanel implements KeyListener {
             if(total == targetNum){
                 score += increaseScore(numbersInput, bonus);
                 
-                if((score >= 300 && round < 3) || (round > 0 && round % 3 == 0)){
+                if((score >= 300 && round < 3) || (round > 0 && round % 3 == 0) && activeMultipliers.size() < 3){
                     newMultiplier();
                 }
+
+                if(round % 5 == 0){
+                    newRule();
+                    currentRule.setActiveStatus(true);
+                }
+                else if(currentRule.getActiveStatus() == true){
+                    currentRule.setActiveStatus(false);
+                }
+
                 round++;
                 
                 reset();
                 targetNum = newTarget();
             }
             else if(numbersInput.size() == 2){
-                generatedNumbers.removeAll(numbersInput);
+                generatedNumbers = new ArrayList<>(numberPool);
                 generatedNumbers.add(total);
                 numberPool = new ArrayList<>(generatedNumbers);
 
@@ -238,6 +288,8 @@ public class numberSequence extends JPanel implements KeyListener {
                 total = 0;
                 bonus++;
                 if(bonus > 2) bonus = 2;
+
+                indexes.clear();
 
                 if(numberPool.size() <= 1){
                     reset();
@@ -252,6 +304,7 @@ public class numberSequence extends JPanel implements KeyListener {
             numbersInput.clear();
             operations.clear();
             total = 0;
+            indexes.clear();
         }
         else if(e.getKeyCode() == KeyEvent.VK_SPACE && gameStart){
             gameStart = false;
@@ -296,7 +349,12 @@ public class numberSequence extends JPanel implements KeyListener {
         int y = 100;
 
         // background
-        g2.setColor(new Color(11, 24, 54));
+        if(currentRule.getActiveStatus() == false){
+            g2.setColor(new Color(11, 24, 54));
+        }
+        else {
+            g2.setColor(new Color(54, 11, 11));
+        }
         g2.fillRect(0, 0, 1000, 800);
 
         // SCORE & SCORE BAR
@@ -324,14 +382,14 @@ public class numberSequence extends JPanel implements KeyListener {
             
             // DRAWS GENERATED NUMBERS
             x = 345 - (15*(poolSize-4));
-            for(Integer i : generatedNumbers){
-                if(numbersInput.contains(i)){
+            for(int i = 0; i < generatedNumbers.size(); i++){
+                if(indexes.contains(i)){
                     g2.setColor(Color.GRAY);
                     g2.fillRect(x-2, 87, 64, 90);
                 }
 
                 g2.setColor(Color.WHITE);
-                g2.drawString(i + " ", x, 160);
+                g2.drawString(generatedNumbers.get(i) + " ", x, 160);
                 x += 75;
             }
 
@@ -357,11 +415,9 @@ public class numberSequence extends JPanel implements KeyListener {
 
             // DRAWS OUTPUT
             g2.setColor(Color.BLACK);
-            //g2.fillRect(440, 500, 150, 85);
             g2.fillRect(762, 445, 150, 85);
             g2.setFont(new Font("Metro Time Sign", Font.BOLD, 55));
             g2.setColor(Color.WHITE);
-            //g2.drawString("= " + total + "", 455, 570);
             g2.drawString("= " + total + "", 770, 515);
 
             // DRAWS ROUND NUMBER
@@ -379,12 +435,15 @@ public class numberSequence extends JPanel implements KeyListener {
             // DRAWS MULTIPLIERS
             y = 670;
             if(activeMultipliers.size() > 0){
-                g2.setColor(Color.ORANGE);
-                g2.setFont(new Font("Verdana", Font.PLAIN, 22));
                 for(multiplier m : activeMultipliers){
-                    g2.drawString(m.flavorText(), 670, y);
+                    m.paint(g2, 670, y);
                     y += 30;
                 }
+            }
+
+            // DRAWS RULE
+            if(currentRule.getActiveStatus()){
+                currentRule.paint(g2, 50, 150);
             }
         }
     }
