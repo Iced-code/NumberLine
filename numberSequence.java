@@ -260,7 +260,7 @@ public class numberSequence extends JPanel implements KeyListener {
             if(total == targetNum){
                 score += increaseScore(numbersInput, bonus);
                 
-                if((score >= 300 && round < 3) || (round > 0 && round % 3 == 0) && activeMultipliers.size() < 3){
+                if((round > 0 && round % 7 == 0) && activeMultipliers.size() < 3){
                     newMultiplier();
                 }
 
@@ -270,6 +270,12 @@ public class numberSequence extends JPanel implements KeyListener {
                 }
                 else if(currentRule.getActiveStatus() == true){
                     currentRule.setActiveStatus(false);
+                }
+
+                if(round % 7 == 0){
+                    if(lives < 7){
+                        lives++;
+                    }
                 }
 
                 round++;
@@ -319,14 +325,14 @@ public class numberSequence extends JPanel implements KeyListener {
         if (c == 'r' || c == 'R') {
             reset();
             lives--;
+            if(lives < 0){
+                lives = 0;
+            }
         }
         else if (c == 'n' || c == 'N') {
             reset();
             targetNum = newTarget();
             lives -= 2;
-        }
-        else if (c == 'p' || c == 'P') {    // TESTING ONLY
-            score += 300;
         }
 
         if(numbersInput.size() >= 2 && numbersInput.size() > operations.size()){

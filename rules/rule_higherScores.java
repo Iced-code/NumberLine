@@ -1,5 +1,4 @@
 package rules;
-
 import java.util.*;
 import java.awt.*;
 
@@ -20,5 +19,16 @@ public class rule_higherScores extends rule{
         }
 
         return minus;
+    }
+
+    @Override
+    public void paint(Graphics2D g, int x, int y){
+        g.setColor(Color.RED);
+        g.setFont(new Font("Verdana", Font.BOLD, 30));
+        g.drawString(getName(), x, y);
+
+        g.setFont(new Font("Verdana", Font.PLAIN, 22));
+        g.drawString("Numbers less than 5", x, y+40);
+        g.drawString("do not give points.", x, y+65);
     }
 }

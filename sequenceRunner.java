@@ -1,53 +1,27 @@
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.net.MalformedURLException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.*;
-import java.util.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.Timer;
-
 
 // MAIN PROGRAM EXECUTER
 public class sequenceRunner extends numberSequence {
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Number Line");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1000, 800);
+            frame.setLocation(350, 50);
+            frame.setLayout(null);
 
-        //makes the game window
-        JFrame frame = new JFrame("reun");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setSize(1000, 800);
-        frame.setLocation(350, 50);
-        frame.setLayout(null);
+            numberSequence sequence = new numberSequence();
+            sequence.setSize(1210, 805);
+            sequence.setLocation(0, 0);
 
-        //makes the game
-        numberSequence sequence = new numberSequence();
-        sequence.setSize(1210, 805);
-        sequence.setLocation(0, 0);
+            frame.getContentPane().add(sequence);
+            frame.addKeyListener(sequence);
 
-        frame.getContentPane().add(sequence);
+            frame.setVisible(true);
 
-        frame.setVisible(true);
-
-        frame.addKeyListener(sequence);
-
-        while(sequence.run() > 0){
-            sequence.run();
-        }
-
-        
-        // ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        // Runnable task = () -> mytTerminal.repaint();
-        // executor.scheduleAtFixedRate(task, 0, 500, TimeUnit.MILLISECONDS);
+            // Run sequence.run() repeatedly on a timer instead of an infinite loop
+            Timer timer = new Timer(16, e -> sequence.run());  // ~60 FPS
+            timer.start();
+        });
     }
 }
