@@ -2,8 +2,10 @@ package rules;
 import java.awt.*;
 import java.util.*;
 
+import javax.swing.JPanel;
 
-public class rule {
+
+public class rule extends JPanel {
     private String name;
     private String description;
     private boolean isActive;
@@ -69,7 +71,9 @@ public class rule {
         return -1;
     }
 
-    public void paint(Graphics2D g, int x, int y){
+    public void paintComponent(Graphics2D g, int x, int y){
+        super.paintComponent(g);
+        
         g.setColor(Color.RED);
         g.setFont(new Font("Verdana", Font.BOLD, 30));
         g.drawString(getName(), x, y);

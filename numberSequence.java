@@ -349,8 +349,10 @@ public class numberSequence extends JPanel implements KeyListener {
     }
 
     // PAINTS SCREEN AND TEXT
-    public void paint(Graphics g){
+    public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D) g;
+        super.paintComponent(g2);
+
         int x = 75;
         int y = 100;
 
@@ -442,14 +444,14 @@ public class numberSequence extends JPanel implements KeyListener {
             y = 670;
             if(activeMultipliers.size() > 0){
                 for(multiplier m : activeMultipliers){
-                    m.paint(g2, 670, y);
+                    m.paintComponent(g2, 670, y);
                     y += 30;
                 }
             }
 
             // DRAWS RULE
             if(currentRule.getActiveStatus()){
-                currentRule.paint(g2, 50, 150);
+                currentRule.paintComponent(g2, 50, 150);
             }
         }
     }

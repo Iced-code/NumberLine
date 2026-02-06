@@ -3,7 +3,7 @@ import java.util.*;
 import java.awt.*;
 
 
-public class rule_higherScores extends rule{
+public class rule_higherScores extends rule {
 
     public rule_higherScores(){
         super("Higher Scores", "Numbers less than 5 do not give points.");
@@ -22,7 +22,9 @@ public class rule_higherScores extends rule{
     }
 
     @Override
-    public void paint(Graphics2D g, int x, int y){
+    public void paintComponent(Graphics2D g, int x, int y){
+        super.paintComponent(g);
+
         g.setColor(Color.RED);
         g.setFont(new Font("Verdana", Font.BOLD, 30));
         g.drawString(getName(), x, y);

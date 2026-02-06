@@ -1,10 +1,13 @@
 package multipliers;
 import java.awt.*;
 import java.util.*;
+
+import javax.swing.JPanel;
+
 import rules.*;
 
 
-public abstract class multiplier {
+public abstract class multiplier extends JPanel {
     private String name;
     private int numberBonus;
     private char multiplierType;
@@ -65,7 +68,9 @@ public abstract class multiplier {
 
     public abstract int calculateBonus(int score, ArrayList<Integer> numbers, ArrayList<Character> operators, rule activeRule);
 
-    public void paint(Graphics2D g, int x, int y){
+    public void paintComponent(Graphics2D g, int x, int y){
+        super.paintComponent(g);
+        
         g.setColor(Color.ORANGE);
         g.setFont(new Font("Verdana", Font.PLAIN, 22));
         g.drawString(flavorText(), x, y);
