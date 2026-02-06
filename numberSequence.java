@@ -134,8 +134,13 @@ public class numberSequence extends JPanel implements KeyListener {
     public int calculateTotal(ArrayList<Integer> numbers, ArrayList<Character> ops){
         int total = 0;
 
+        if (numbers.size() == 0) return total;
+            
         total = numbers.get(0);
-        for(int i = 0; i < ops.size(); i++){
+
+        int numOps = ops.size() % numbers.size() != 0 ? ops.size() % numbers.size(): (ops.size()-1) % numbers.size();
+
+        for(int i = 0; i < numOps; i++){
             if(ops.get(i) == '+'){
                 total += numbers.get(i+1);
             }
@@ -150,10 +155,16 @@ public class numberSequence extends JPanel implements KeyListener {
                     if(total % numbers.get(i+1) == 0){
                         total /= numbers.get(i+1);
                     }
-                } catch(ArithmeticException e) {}
+                    else {
+                        throw new ArithmeticException("Invalid division");
+                    }
+                } catch(Exception e) {
+                    total = 0;
+                }
             }
         }
 
+        // System.out.println(total);
         return total;
     }
 
@@ -235,7 +246,7 @@ public class numberSequence extends JPanel implements KeyListener {
             }
         }
 
-        repaint();
+        //repaint();
     }
 
     @Override
@@ -254,13 +265,15 @@ public class numberSequence extends JPanel implements KeyListener {
                 }
 
                 input = input.substring(0, input.length() - 1);
+
+                total = calculateTotal(numbersInput, operations);
             }
         }
         else if(e.getKeyCode() == KeyEvent.VK_ENTER){   // PERFORMS CALCULATION. IF HIT TARGET -> NEXT ROUND, ELSE CALCULATES TWO NUMBER INPUT
-            if(total == targetNum){
+            if(total == targetNum && numbersInput.size() > operations.size()){
                 score += increaseScore(numbersInput, bonus);
                 
-                if((round > 0 && round % 7 == 0) && activeMultipliers.size() < 3){
+                if((round > 0 && round % 4 == 0) && activeMultipliers.size() < 3){
                     newMultiplier();
                 }
 
@@ -322,7 +335,7 @@ public class numberSequence extends JPanel implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         char c = e.getKeyChar();
-        if (c == 'r' || c == 'R') {
+        if ((c == 'r' || c == 'R') && !gameStart) {
             reset();
             lives--;
             if(lives < 0){
@@ -333,6 +346,9 @@ public class numberSequence extends JPanel implements KeyListener {
             reset();
             targetNum = newTarget();
             lives -= 2;
+        }
+        else if (c == 'q' || c == 'Q') {
+            System.exit(0);
         }
 
         if(numbersInput.size() >= 2 && numbersInput.size() > operations.size()){
@@ -422,6 +438,10 @@ public class numberSequence extends JPanel implements KeyListener {
             }
 
             // DRAWS OUTPUT
+            if(total == targetNum){
+                g2.setColor(Color.ORANGE);
+                g2.fillRect(752, 445, 170, 95);
+            }
             g2.setColor(Color.BLACK);
             g2.fillRect(762, 445, 150, 85);
             g2.setFont(new Font("Metro Time Sign", Font.BOLD, 55));

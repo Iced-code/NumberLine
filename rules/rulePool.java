@@ -13,7 +13,8 @@ public class rulePool {
     }
 
     private void loadRulePool(){
-        rules.add(new rule_higherScores());
+        rules.add(new rule_HigherScores());
+        rules.add(new rule_OddsOut());
     }
 
     public rule getRandomRule(){
